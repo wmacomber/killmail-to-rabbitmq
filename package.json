@@ -1,0 +1,24 @@
+{
+  "name": "killmail-to-rabbitmq",
+  "version": "1.0.0",
+  "description": "Listens for killmail notifications and publishes them to a RabbitMQ queue.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "eve",
+    "eveonline",
+    "killmail",
+    "queue",
+    "rabbitmq"
+  ],
+  "author": "Walter Macomber <walter@macomber.tech>",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "amqplib": "^0.10.3",
+    "node-cache": "^5.1.2",
+    "node-fetch": "^2.6.12",
+    "ws": "^8.13.0"
+  }
+}
