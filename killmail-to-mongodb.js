@@ -8,7 +8,7 @@ const ts = () => { return (new Date()).toISOString(); }
 const l = (s) => { console.log(`[${ts()}] ${s}`); }
 
 async function main() {
-    const mongoUri = `${config.mongo.host}:${config.mongo.port}/${config.mongo.name}`;
+    const mongoUri = `mongodb://${config.mongo.host}:${config.mongo.port}/${config.mongo.name}`;
     l(`MongoDB connection::: ${mongoUri}`);
     await mongoose.connect(mongoUri);
     l("Connected to MongoDB server");
