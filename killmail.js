@@ -43,7 +43,7 @@ const KillmailSchema = new mongoose.Schema({
     },
     "killmail_time": {
         type: Date,
-        index: { expires: "1m" }
+        index: { expires: "28 days" }
     },
     "solar_system_id": { type: Number },
     "victim": { type: VictimSchema },
