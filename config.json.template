@@ -6,5 +6,10 @@
         "user": "",
         "pass": "",
         "queue": "killmail"
+    },
+    "mongo": {
+        "host": "",
+        "port": 27017,
+        "name": "eve"
     }
 }
