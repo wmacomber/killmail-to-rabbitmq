@@ -47,6 +47,7 @@ const KillmailSchema = new mongoose.Schema({
     },
     "solar_system_id": { type: Number },
     "victim": { type: VictimSchema },
+    "war_id": { type: Number },
     "zkb": {
         "locationID": { type: Number },
         "hash": { type: String },
