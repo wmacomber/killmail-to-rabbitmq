@@ -5,6 +5,7 @@ const VERBOSE = true;
 const POLLING_TYPE = "http"; // "http" or "ws"
 
 const config = require("./config.json");
+let meantToCloseRabbit = false;
 
 /**
  * To do simple HTTP fetch polling:
