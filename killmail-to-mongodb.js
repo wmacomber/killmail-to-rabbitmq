@@ -6,6 +6,7 @@ const config = require("./config.json");
 
 const ts = () => { return (new Date()).toISOString(); }
 const l = (s) => { console.log(`[${ts()}] ${s}`); }
+const VERBOSE = true;
 
 async function createRabbitFeed() {
     const uri = `amqp://${config.rabbit.user}:${config.rabbit.pass}@${config.rabbit.host}:${config.rabbit.port}/${config.rabbit.vhost}`;
