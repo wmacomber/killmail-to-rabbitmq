@@ -8,6 +8,7 @@ const ts = () => { return (new Date()).toISOString(); }
 const l = (s) => { console.log(`[${ts()}] ${s}`); }
 
 async function createRabbitFeed() {
+    const uri = `amqp://${config.rabbit.user}:${config.rabbit.pass}@${config.rabbit.host}:${config.rabbit.port}/${config.rabbit.vhost}`;
     l(`RabbitMQ connection::: ${uri}`);
     const rabbit = await amqplib.connect(uri);
     l("Connected to RabbitMQ server, creating channel");
@@ -49,7 +50,6 @@ async function main() {
     l(`MongoDB connection::: ${mongoUri}`);
     await mongoose.connect(mongoUri);
     l("Connected to MongoDB server");
-    const uri = `amqp://${config.rabbit.user}:${config.rabbit.pass}@${config.rabbit.host}:${config.rabbit.port}/${config.rabbit.vhost}`;
     
     await createRabbitFeed();
 
