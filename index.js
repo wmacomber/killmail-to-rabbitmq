@@ -98,38 +98,25 @@ async function createRabbitFeed() { // haha
     const rabbit = await amqplib.connect(uri);
     if (VERBOSE) l("Connected, now creating channel...");
     const killfeed = await rabbit.createChannel();
-    if (VERBOSE) l("Created channel, building error handler");
+    if (VERBOSE) l("Created channel, setting prefetch");
+    killfeed.prefetch(1);
+    if (VERBOSE) l("Set prefetch, building error handler");
     killfeed.on("error", (err) => {
         l(`killfeed had an error::: ${err}`);
     });
     if (VERBOSE) l("Created error handler, building close handler");
-    killfeed.on("close", () => {
+    killfeed.on("close", (msg) => {
         if (!meantToCloseRabbit) {
-            l("rabbit close fired when we didn't mean to, recreating...");
-            createRabbitFeed();
+            l(`rabbit close fired when we didn't mean to::: ${msg}`);
         }
     });
-    if (VERBOSE) l("Created close handler, setting up consumer thread");
-    killfeed.consume(config.rabbit.queue, async (msg) => {
-        if (msg !== null) {
-            let data = JSON.parse(msg.content.toString("utf-8"));
-            killfeed.ack(msg); // do I need to ack?
-            try {
-                feedBroadcast(data);
-            } catch (exc) {
-                l(`KILLFEED CONSUME EXCEPTION<${typeof exc}>: ${exc}`);
-            }
-        }
-    });
-    return killfeed;
-}
-
-async function main() {
-    // this can't be right, the first time the object recreates itself this reference should be broken
-    let killfeed = await createRabbitFeed();
     if (VERBOSE) l("Created channel, now starting loop...");
     if (POLLING_TYPE === "http") main_http(killfeed);
     if (POLLING_TYPE === "ws") main_ws(killfeed);
+}
+
+async function main() {
+    await createRabbitFeed();
 }
 
 main().catch((exc) => {
