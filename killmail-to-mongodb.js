@@ -7,19 +7,24 @@ const config = require("./config.json");
 const ts = () => { return (new Date()).toISOString(); }
 const l = (s) => { console.log(`[${ts()}] ${s}`); }
 
-async function main() {
-    const mongoUri = `mongodb://${config.mongo.host}:${config.mongo.port}/${config.mongo.name}`;
-    l(`MongoDB connection::: ${mongoUri}`);
-    await mongoose.connect(mongoUri);
-    l("Connected to MongoDB server");
-    const uri = `amqp://${config.rabbit.user}:${config.rabbit.pass}@${config.rabbit.host}:${config.rabbit.port}/${config.rabbit.vhost}`;
+async function createRabbitFeed() {
     l(`RabbitMQ connection::: ${uri}`);
     const rabbit = await amqplib.connect(uri);
     l("Connected to RabbitMQ server, creating channel");
     const killfeed = await rabbit.createChannel();
     l("Created channel, setting prefetch");
     killfeed.prefetch(1);
-    l("Set prefetch, setting up consumer thread");
+    l("Set prefetch, building error handler");
+    killfeed.on("error", (err) => {
+        l(`killfeed had an error::: ${err}`);
+    });
+    if (VERBOSE) l("Created error handler, building close handler");
+    killfeed.on("close", (msg) => {
+        if (!meantToCloseRabbit) {
+            l(`rabbit close fired when we didn't mean to::: ${msg}`);
+        }
+    });
+    l("Created close handler, setting up consumer thread");
     killfeed.consume(config.rabbit.queue, async (msg) => {
         if (msg !== null) {
             killfeed.ack(msg);
@@ -37,6 +42,16 @@ async function main() {
         }
     });
     l("Set up consumer thread, which should now be running.");
+}
+
+async function main() {
+    const mongoUri = `mongodb://${config.mongo.host}:${config.mongo.port}/${config.mongo.name}`;
+    l(`MongoDB connection::: ${mongoUri}`);
+    await mongoose.connect(mongoUri);
+    l("Connected to MongoDB server");
+    const uri = `amqp://${config.rabbit.user}:${config.rabbit.pass}@${config.rabbit.host}:${config.rabbit.port}/${config.rabbit.vhost}`;
+    
+    await createRabbitFeed();
 
     l("Setting up heartbeat thread");
     const intHeartbeat = setInterval(() => {
