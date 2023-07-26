@@ -100,8 +100,7 @@ async function createRabbitFeed() { // haha
     const killfeed = await rabbit.createChannel();
     if (VERBOSE) l("Created channel, building error handler");
     killfeed.on("error", (err) => {
-        l("killfeed had an error, recreating...");
-        createRabbitFeed();
+        l(`killfeed had an error::: ${err}`);
     });
     if (VERBOSE) l("Created error handler, building close handler");
     killfeed.on("close", () => {
