@@ -20,13 +20,20 @@ let meantToCloseRabbit = false;
 
 const ts = () => { return (new Date()).toISOString(); }
 const l = (s) => { console.log(`[${ts()}] ${s}`); }
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
 async function main_http(killfeed) {
     let polling = true;
     while(polling) {
         try {
             const r = await fetch("https://redisq.zkillboard.com/listen.php");
-            const j = (await r.json()).package;
+            let j;
+            try {
+                j = (await r.json()).package;
+            } catch { 
+                await sleep(30 * 1000); // give it a bit before we try to poll again
+                continue; // we can't do anything with the non-result
+            }
             if (j !== null && typeof j !== "undefined") {
             // the HTTP endpoint has a different data format than the websocket one -
             // massage this to make it like the websocket format (since I already wrote other
