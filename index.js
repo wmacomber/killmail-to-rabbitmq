@@ -22,6 +22,10 @@ const ts = () => { return (new Date()).toISOString(); }
 const l = (s) => { console.log(`[${ts()}] ${s}`); }
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
+const sendToQueueOpts = {
+    expiration: "86400000", // 1 day
+};
+
 async function main_http(killfeed) {
     let polling = true;
     while(polling) {
@@ -47,7 +51,7 @@ async function main_http(killfeed) {
                 "zkb": j.zkb
             };
             if (VERBOSE) l(`KILL [${o.killmail_id}]: ${o.killmail_time} for ${o.zkb.totalValue.toLocaleString("en-US")} ISK`);
-                killfeed.sendToQueue(config.rabbit.queue, Buffer.from(JSON.stringify(o))); // wants a buffer
+                killfeed.sendToQueue(config.rabbit.queue, Buffer.from(JSON.stringify(o)), sendToQueueOpts); // wants a buffer
             }
         } catch (exc) {
             l(`main_http() EXCEPTION<${typeof exc}>: ${exc}`);
@@ -94,7 +98,7 @@ async function main_ws(killfeed) {
         };
         if (typeof jsonData["action"] === "undefined") { //
             if (VERBOSE) l(`KILL [${jsonData.killmail_id}]: ${jsonData.killmail_time} for ${jsonData.zkb.totalValue.toLocaleString("en-US")} ISK`);
-            killfeed.sendToQueue(config.rabbit.queue, Buffer.from(JSON.stringify(jsonData))); // wants a buffer
+            killfeed.sendToQueue(config.rabbit.queue, Buffer.from(JSON.stringify(jsonData)), sendToQueueOpts); // wants a buffer
         }
     });
 }
