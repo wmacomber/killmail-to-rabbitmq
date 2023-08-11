@@ -58,6 +58,7 @@ async function main_http(killfeed) {
             polling = false;
         }
     }
+    process.exit(1);
 }
 
 async function main_ws(killfeed) {
